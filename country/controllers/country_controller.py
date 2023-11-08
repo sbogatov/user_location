@@ -1,5 +1,7 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, Result
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +14,7 @@ country_router = APIRouter()
 
 @country_router.get('/country')
 async def get_countries(session: AsyncSession = Depends(get_session)):
-    countries = await session.execute(select(Country))
+    countries: Result[Any] = await session.execute(select(Country))
     return countries.scalars().all()
 
 

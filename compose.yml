@@ -1,0 +1,46 @@
+version: "3.8"
+services:
+  user_location_backend:
+    container_name: user_location_backend
+    build: &backend_build
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    depends_on:
+      - user_location_db
+    ports:
+      - "8000:8000"
+    networks:
+      user_location_network:
+        aliases:
+          - user_location_backend
+    environment:
+      HOST: user_location_db
+      PORT: 5432
+      NAME: alchemy
+      USERNAME: postgres
+      PASSWORD: masterkey
+    command: sh -c 'alembic upgrade head && poetry run python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload'
+
+  user_location_db:
+    container_name: user_location_db
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "masterkey"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DB: "alchemy"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      user_location_network:
+        aliases:
+          - user_location_db
+
+networks:
+  user_location_network:
+    name: user_location_network
+
+volumes:
+  pgdata:

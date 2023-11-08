@@ -18,7 +18,7 @@ async def get_cities(session: AsyncSession = Depends(get_session)):
 
 
 @city_router.post('/city')
-async def create_country(city_dto: CityDTO, session: AsyncSession = Depends(get_session)):
+async def create_city(city_dto: CityDTO, session: AsyncSession = Depends(get_session)):
     city: City = City(id=city_dto.id, name=city_dto.name, country_id=city_dto.country_id)
     session.add(city)
     try:

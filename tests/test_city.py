@@ -12,6 +12,7 @@ from tests.base_test import BaseTest
 class TestCity(BaseTest):
     async def test_add_city(self, client: AsyncClient, test_db_session: AsyncSession) -> None:
         test_db_session.add(Country(id=0, name="Russia"))
+        await test_db_session.commit()
 
         payload: dict = {"id": 0, "country_id": 0, "name": "Moscow"}
         response: Response = await client.post("/city", json=payload)

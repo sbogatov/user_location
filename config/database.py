@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import AsyncGenerator
 
 from pydantic_settings import BaseSettings
 from sqlalchemy import NullPool
@@ -27,6 +28,6 @@ async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession
 Base = declarative_base()
 
 
-async def get_session() -> AsyncSession:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session() as session:
         yield session

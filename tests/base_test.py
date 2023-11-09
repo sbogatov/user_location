@@ -13,6 +13,7 @@ from main import app
 class BaseTest(ABC):
 
     SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://postgres:masterkey@localhost:5432/test"
+    HOST = "http://localhost"
 
     @pytest_asyncio.fixture(scope='function')
     async def async_db_engine(self) -> AsyncGenerator[AsyncEngine, None]:
@@ -36,15 +37,10 @@ class BaseTest(ABC):
         )
 
         async with async_session() as session:
-            await session.begin()
-
             yield session
-
-            await session.rollback()
-            await session.commit()
 
     @pytest_asyncio.fixture(scope="function")
     async def client(self, test_db_session) -> AsyncGenerator[AsyncClient, None]:
         app.dependency_overrides[get_session] = lambda: test_db_session
-        async with AsyncClient(app=app, base_url='http://localhost') as client:
+        async with AsyncClient(app=app, base_url=self.HOST) as client:
             yield client

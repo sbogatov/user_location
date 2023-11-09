@@ -1,5 +1,7 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, Result
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +14,7 @@ country_router = APIRouter()
 
 @country_router.get('/country')
 async def get_countries(session: AsyncSession = Depends(get_session)):
-    countries = await session.execute(select(Country))
+    countries: Result[Any] = await session.execute(select(Country))
     return countries.scalars().all()
 
 
@@ -22,5 +24,5 @@ async def create_country(country_dto: CountryDTO, session: AsyncSession = Depend
     session.add(country)
     try:
         await session.commit()
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="Duplicated country")
+    except IntegrityError as exc:
+        raise HTTPException(status_code=400, detail="Duplicated country") from exc

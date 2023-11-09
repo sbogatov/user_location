@@ -24,5 +24,5 @@ async def create_country(country_dto: CountryDTO, session: AsyncSession = Depend
     session.add(country)
     try:
         await session.commit()
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="Duplicated country")
+    except IntegrityError as exc:
+        raise HTTPException(status_code=400, detail="Duplicated country") from exc

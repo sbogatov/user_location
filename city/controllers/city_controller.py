@@ -23,5 +23,5 @@ async def create_city(city_dto: CityDTO, session: AsyncSession = Depends(get_ses
     session.add(city)
     try:
         await session.commit()
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="Duplicated city")
+    except IntegrityError as exc:
+        raise HTTPException(status_code=400, detail="Duplicated city") from exc

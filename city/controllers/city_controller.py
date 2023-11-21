@@ -11,7 +11,7 @@ from config.database import get_session
 city_router = APIRouter()
 
 
-@city_router.get('/city')
+@city_router.get('/city', response_model=list[CityDTO])
 async def get_cities(session: AsyncSession = Depends(get_session)):
     cities = await session.execute(select(City))
     return cities.scalars().all()

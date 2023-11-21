@@ -12,7 +12,7 @@ from country.dto.country_dto import CountryDTO
 country_router = APIRouter()
 
 
-@country_router.get('/country')
+@country_router.get('/country', response_model=list[CountryDTO])
 async def get_countries(session: AsyncSession = Depends(get_session)):
     countries: Result[Any] = await session.execute(select(Country))
     return countries.scalars().all()

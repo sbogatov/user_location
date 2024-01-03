@@ -16,8 +16,8 @@ class CountryRepository:
         return countries.scalars().all()
 
     @staticmethod
-    async def add(country_dto: CountryDTO, session: AsyncSession) -> None:
-        country: Country = Country(id=country_dto.id, name=country_dto.name)
+    async def add(name: str, session: AsyncSession) -> None:
+        country: Country = Country(name=name)
         session.add(country)
         try:
             await session.commit()

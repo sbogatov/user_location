@@ -18,8 +18,8 @@ async def get_countries(session: AsyncSession = Depends(get_session)) -> list[Co
 
 
 @country_router.post(COUNTRIES_URL)
-async def create_country(country_dto: CountryDTO, session: AsyncSession = Depends(get_session)) -> None:
+async def create_country(name: str, session: AsyncSession = Depends(get_session)) -> None:
     try:
-        await CountryRepository.add(country_dto=country_dto, session=session)
+        await CountryRepository.add(name=name, session=session)
     except DuplicatedObjectException as exc:
         raise HTTPException(status_code=400, detail=exc.message) from exc

@@ -18,8 +18,8 @@ async def get_cities(country_id: int, session: AsyncSession = Depends(get_sessio
 
 
 @city_router.post(CITIES_URL)
-async def create_city(city_dto: CityDTO, session: AsyncSession = Depends(get_session)) -> None:
+async def create_city(name: str, country_id: int, session: AsyncSession = Depends(get_session)) -> None:
     try:
-        await CityRepository.add(city_dto=city_dto, session=session)
+        await CityRepository.add(name=name, country_id=country_id, session=session)
     except DuplicatedObjectException as exc:
         raise HTTPException(status_code=400, detail=exc.message) from exc

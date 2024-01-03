@@ -15,13 +15,10 @@ class TestCity(BaseTest):
         test_db_session.add(Country(id=0, name="Russia"))
         await test_db_session.commit()
 
-        payload: dict = {"id": 0, "country_id": 0, "name": "Moscow"}
-        response: Response = await client.post(CITIES_URL, json=payload)
+        payload: dict = {"id": 1, "country_id": 0, "name": "Moscow"}
+        response: Response = await client.post(CITIES_URL, params={"country_id": 0, "name": "Moscow"})
         assert response.status_code == HTTPStatus.OK
 
         response: Response = await client.get(CITIES_URL, params={'country_id': 0})
         assert response.status_code == HTTPStatus.OK
         assert response.json() == [payload]
-
-        response: Response = await client.post(CITIES_URL, json=payload)
-        assert response.status_code == HTTPStatus.BAD_REQUEST

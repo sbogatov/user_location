@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CountryDTO(BaseModel):
-    id: int
-    name: str
+    id: int = Field(ge=0)
+    name: str = Field(min_length=2)

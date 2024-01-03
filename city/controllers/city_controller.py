@@ -1,27 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from city.dto.city_dto import CityDTO
 from city.models.city_model import City
+from city.repositories.city_repository import CityRepository
 from config.database import get_session
-
+from exceptions import DuplicatedObjectException
 
 city_router = APIRouter()
 
-
-@city_router.get('/city')
-async def get_cities(session: AsyncSession = Depends(get_session)):
-    cities = await session.execute(select(City))
-    return cities.scalars().all()
+CITIES_URL = "/cities"
 
 
-@city_router.post('/city')
-async def create_country(city_dto: CityDTO, session: AsyncSession = Depends(get_session)):
-    city: City = City(id=city_dto.id, name=city_dto.name, country_id=city_dto.country_id)
-    session.add(city)
+@city_router.get(CITIES_URL, response_model=list[CityDTO])
+async def get_cities(country_id: int, session: AsyncSession = Depends(get_session)) -> list[City]:
+    return await CityRepository.get_by_country_id(country_id=country_id, session=session)
+
+
+@city_router.post(CITIES_URL)
+async def create_city(name: str, country_id: int, session: AsyncSession = Depends(get_session)) -> None:
     try:
-        await session.commit()
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="Duplicated city")
+        await CityRepository.add(name=name, country_id=country_id, session=session)
+    except DuplicatedObjectException as exc:
+        raise HTTPException(status_code=400, detail=exc.message) from exc
